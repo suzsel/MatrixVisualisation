@@ -14,15 +14,15 @@ This repository contains tools for visualizing matrix operations in both 2D and 
 ### 2D Matrix Visualization
 
 <p float="left">
-  <img src="images/figure_1.png" width="49%" />
-  <img src="images/figure_2.png" width="49%" />
+  <img src="images/Figure_1.png" width="49%" />
+  <img src="images/Figure_2.png" width="49%" />
 </p>
 
 ### 3D Matrix Visualization
 
 <p float="left">
-  <img src="images/figure_3.png" width="49%" />
-  <img src="images/figure_4.png" width="49%" />
+  <img src="images/Figure_3.png" width="49%" />
+  <img src="images/Figure_4.png" width="49%" />
 </p>
 
 ## Getting Started
