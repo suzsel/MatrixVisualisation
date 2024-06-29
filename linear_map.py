@@ -1,9 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider, Button
+from matplotlib.widgets import Slider, Button, CheckButtons
 
 # Define initial values for the transformation matrix
 initial_values = {'m11': 1, 'm12': 0, 'm21': 0, 'm22': 1}
+previous_eigen = []
+colors = ['blue', 'green']
 
 # Generate a grid in the 2D plane
 x = np.linspace(-1, 1, 10)
@@ -18,6 +20,7 @@ ax.set_xlim(-3, 3)
 ax.set_ylim(-3, 3)
 ax.set_aspect('equal')
 ax.set_title('2D Linear Transformation')
+legend = ax.legend()
 
 # Draw the initial grid lines
 lines = []
@@ -41,13 +44,39 @@ def apply_transformation(matrix, points):
     return np.dot(matrix, points)
 
 
+def plot_eigen(matrix, show):
+    global previous_eigen
+    global legend
+    # Clear previous arrows
+    for eigen in previous_eigen:
+        eigen.remove()
+    previous_eigen = []
+
+    eigenvalues, eigenvectors = np.linalg.eig(matrix)
+    # Plot the eigenvectors
+    if show:
+        for i in range(len(eigenvalues)):
+            start_point = [0, 0]
+            end_point = eigenvectors[:, i] * eigenvalues[i]
+            eigen = ax.quiver(start_point[0], start_point[1], end_point[0], end_point[1], scale=1, scale_units='xy',
+                              angles='xy',
+                              color=colors[i],
+                              label=f'Eigenvector {i + 1} with $\lambda={eigenvalues[i]:.3f}$')
+            previous_eigen.append(eigen)
+        ax.legend()
+    else:
+        legend.remove()
+
+
 # Update function for the plot and determinant
 def update(val):
+    show = show_eigen.get_status()[0]  # Get the status of the checkbox
     m11, m12, m21, m22 = sm11.val, sm12.val, sm21.val, sm22.val
     transform_matrix = np.array([[m11, m12], [m21, m22]])
     det = np.linalg.det(transform_matrix)
     det_text.set_text(f'Determinant: {det:.2f}')
     transformed_points = apply_transformation(transform_matrix, points).reshape(2, len(x), len(y))
+    plot_eigen(transform_matrix, show)
 
     for i in range(len(x)):
         transformed_lines[2 * i].set_data(transformed_points[0, i, :], transformed_points[1, i, :])
@@ -85,5 +114,11 @@ sm22.on_changed(update)
 ax_reset = plt.axes([0.05, 0.025, 0.1, 0.04], facecolor=axcolor)
 button = Button(ax_reset, 'Reset', color=axcolor, hovercolor='0.975')
 button.on_clicked(reset)
+
+ax_check = plt.axes([0.05, 0.5, 0.21, 0.1], facecolor=axcolor)
+show_eigen = CheckButtons(ax_check, ['Eigenvectors'], [False])
+show_eigen.on_clicked(update)
+
+
 
 plt.show()
